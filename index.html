@@ -208,6 +208,45 @@
       </div>
     </div>
   </section>
+  <style>
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.15em;margin-bottom:-.15em}
+.w>span{display:inline-block;transform:translateY(110%);opacity:0;
+        transition:transform .7s cubic-bezier(.2,.7,.2,1),opacity .7s}
+.in .w>span{transform:none;opacity:1}
+</style>
+
+<script>
+var els=document.querySelectorAll('h1,h2,h3,p');
+
+els.forEach(function(el){
+  var walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);
+  var nodes=[],n;
+  while(n=walker.nextNode()) nodes.push(n);
+
+  var count=0;
+  nodes.forEach(function(node){
+    var parts=node.textContent.split(/(\s+)/);
+    var frag=document.createDocumentFragment();
+    parts.forEach(function(p){
+      if(!p) return;
+      if(/^\s+$/.test(p)){ frag.appendChild(document.createTextNode(' ')); return; }
+      var w=document.createElement('span'); w.className='w';
+      var s=document.createElement('span'); s.textContent=p;
+      s.style.transitionDelay=Math.min(count*40,800)+'ms';
+      count++;
+      w.appendChild(s); frag.appendChild(w);
+    });
+    node.parentNode.replaceChild(frag,node);
+  });
+});
+
+var io=new IntersectionObserver(function(list){
+  list.forEach(function(x){
+    if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}
+  })
+},{threshold:.2});
+els.forEach(function(e){io.observe(e)});
+</script>
 
   <section class="alt" id="bonuses">
     <div class="wrap">
